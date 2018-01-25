@@ -7,6 +7,15 @@ import torchvision.transforms as transforms
 from util import is_image_file, load_img
 
 
+def get_training_set():
+    train_dir = "train_data/"
+    return DatasetFromFolder(train_dir)
+
+def get_test_set():
+    test_dir = "test_data/"
+    return DatasetFromFolder(test_dir)
+
+
 class DatasetFromFolder(data.Dataset):
     def __init__(self, image_dir):
         super(DatasetFromFolder, self).__init__()

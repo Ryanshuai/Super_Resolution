@@ -8,14 +8,14 @@ import torch.optim as optim
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from networks import define_G, define_D, GANLoss, print_network
-from data import get_training_set, get_test_set
+from dataset import get_training_set, get_test_set
 import torch.backends.cudnn as cudnn
 
 # Training settings
 parser = argparse.ArgumentParser(description='pix2pix-PyTorch-implementation')
 parser.add_argument('--dataset', required=True, help='facades')
 parser.add_argument('--batchSize', type=int, default=1, help='training batch size')
-parser.add_argument('--testBatchSize', type=int, default=1, help='testing batch size')
+parser.add_argument('--testBatchSize', type=int, default=10, help='testing batch size')
 parser.add_argument('--nEpochs', type=int, default=200, help='number of epochs to train for')
 parser.add_argument('--input_nc', type=int, default=3, help='input image channels')
 parser.add_argument('--output_nc', type=int, default=3, help='output image channels')
@@ -41,11 +41,12 @@ if opt.cuda:
     torch.cuda.manual_seed(opt.seed)
 
 print('===> Loading datasets')
-root_path = "dataset/"
+
 train_set = get_training_set()
-#test_set = get_test_set(root_path + opt.dataset)
+test_set = get_test_set()
+
 training_data_loader = DataLoader(dataset=train_set, num_workers=opt.threads, batch_size=opt.batchSize, shuffle=True)
-#testing_data_loader = DataLoader(dataset=test_set, num_workers=opt.threads, batch_size=opt.testBatchSize, shuffle=False)
+testing_data_loader = DataLoader(dataset=test_set, num_workers=opt.threads, batch_size=opt.testBatchSize, shuffle=False)
 
 print('===> Building model')
 netG = define_G(opt.input_nc, opt.output_nc, opt.ngf, 'batch', False, [0])
@@ -133,19 +134,19 @@ def train(epoch):
             epoch, iteration, len(training_data_loader), loss_d.data[0], loss_g.data[0]))
 
 
-# def test():
-#     avg_psnr = 0
-#     for batch in testing_data_loader:
-#         input, target = Variable(batch[0], volatile=True), Variable(batch[1], volatile=True)
-#         if opt.cuda:
-#             input = input.cuda()
-#             target = target.cuda()
-#
-#         prediction = netG(input)
-#         mse = criterionMSE(prediction, target)
-#         psnr = 10 * log10(1 / mse.data[0])
-#         avg_psnr += psnr
-#     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(testing_data_loader)))
+def test():
+    avg_psnr = 0
+    for batch in testing_data_loader:
+        input, target = Variable(batch[0], volatile=True), Variable(batch[1], volatile=True)
+        if opt.cuda:
+            input = input.cuda()
+            target = target.cuda()
+
+        prediction = netG(input)
+        mse = criterionMSE(prediction, target)
+        psnr = 10 * log10(1 / mse.data[0])
+        avg_psnr += psnr
+    print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(testing_data_loader)))
 
 
 def checkpoint(epoch):
@@ -161,6 +162,6 @@ def checkpoint(epoch):
 
 for epoch in range(1, opt.nEpochs + 1):
     train(epoch)
-    #test()
+    test()
     if epoch % 50 == 0:
         checkpoint(epoch)
