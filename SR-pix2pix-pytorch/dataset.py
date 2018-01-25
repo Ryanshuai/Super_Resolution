@@ -19,10 +19,10 @@ def get_test_set():
 class DatasetFromFolder(data.Dataset):
     def __init__(self, image_dir):
         super(DatasetFromFolder, self).__init__()
-        self.inter_4_path = join(image_dir, "inter_4")
+        self.inter_4_path = join(image_dir, "LR_4")
         self.inter_4_filelist = listdir(self.inter_4_path)
 
-        self.high_resolution_images_path = join(image_dir, "high_resolution_images")
+        self.high_resolution_images_path = join(image_dir, "HR")
         self.high_filelist = listdir(self.high_resolution_images_path)
 
         transform_list = [transforms.ToTensor(),
@@ -32,11 +32,9 @@ class DatasetFromFolder(data.Dataset):
 
     def __getitem__(self, index):
         # Load Image
-        high_file = 'high_'+self.inter_4_filelist[index][6:]
-
         input = load_img(join(self.inter_4_path, self.inter_4_filelist[index]))
         input = self.transform(input)
-        target = load_img(join(self.high_resolution_images_path, high_file))
+        target = load_img(join(self.high_resolution_images_path, self.inter_4_filelist[index]))
         target = self.transform(target)
 
         return input, target

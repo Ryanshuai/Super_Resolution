@@ -6,11 +6,11 @@ import torchvision.transforms as transforms
 
 from util import load_img, save_img
 
-test_input_fold = 'test_data/inter_4/'
-test_target_fold = 'test_data/high_resolution_images/'
+test_input_fold = 'test_data/LR_4/'
+test_target_fold = 'test_data/HR/'
 test_result_fold = 'test_data/result/'
 
-model_parameter_path = 'checkpoint/facades/netG_model_epoch_200.pth'
+model_parameter_path = 'checkpoint/facades/netG_model_epoch_150.pth'
 netG = torch.load(model_parameter_path)
 
 image_filelist = os.listdir(test_input_fold)
@@ -23,7 +23,7 @@ transform = transforms.Compose(transform_list)
 for image_name in image_filelist:
     img = load_img(test_input_fold + image_name)
     img = transform(img)
-    input = Variable(img, volatile=True).view(1, -1, 256, 256)
+    input = Variable(img, volatile=True).view(1, -1, 768, 768)
 
     if True: # opt.cuda:
         netG = netG.cuda()
