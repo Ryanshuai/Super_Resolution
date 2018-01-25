@@ -11,7 +11,7 @@ def get_training_set():
     return DatasetFromFolder(train_dir)
 
 
-def get_test_set(root_dir):
-    test_dir = join(root_dir, "test")
+def get_test_set():
+    test_dir = join(father_fold, "test_data")
 
     return DatasetFromFolder(test_dir)
