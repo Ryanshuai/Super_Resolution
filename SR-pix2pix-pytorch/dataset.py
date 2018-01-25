@@ -23,11 +23,11 @@ class DatasetFromFolder(data.Dataset):
 
     def __getitem__(self, index):
         # Load Image
-        assert self.inter_4_filelist[index][6:] == self.high_filelist[index][5:]
+        high_file = 'high_'+self.inter_4_filelist[index][6:]
 
         input = load_img(join(self.inter_4_path, self.inter_4_filelist[index]))
         input = self.transform(input)
-        target = load_img(join(self.high_resolution_images_path, self.high_filelist[index]))
+        target = load_img(join(self.high_resolution_images_path, high_file))
         target = self.transform(target)
 
         return input, target
